@@ -20,7 +20,7 @@ jobs:
   build_and_test:
     # This job will run on a self-hosted runner with the "staging" label.
     # Ensure your self-hosted runner for staging has the label `staging` assigned to it.
-    runs-on: [production, staging]  # Self-hosted EC2 with Tomcat installed (Staging)
+    runs-on: [self-hosted, staging]  # Self-hosted EC2 with Tomcat installed (Staging)
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
