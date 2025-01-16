@@ -14,8 +14,8 @@
     <distributionManagement>
        <snapshotRepository>
           <id>github-action-assign</id>
-          <name>hello-world-war-libs-release</name>
-          <url>http://3.110.223.11:8082/artifactory/hello-world-war-libs-release</url>
+          <name>github-action-assign-libs-release</name>
+          <url>http://3.110.223.11:8082/artifactory/github-action-assign-libs-release</url>
        </snapshotRepository>
     </distributionManagement>
     <dependencies>
