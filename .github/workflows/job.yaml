@@ -19,7 +19,7 @@ jobs:
   build_and_test:
     # This job will run on a self-hosted runner with the "staging" label.
     # Ensure your self-hosted runner for staging has the label `staging` assigned to it.
-    runs-on: [production, staging]  # Self-hosted EC2 with Tomcat installed (Staging)
+    runs-on: [self-hosted, Linux]  # Self-hosted EC2 with Tomcat installed (Staging)
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -41,7 +41,7 @@ jobs:
   sonar_analysis:
     # This job will also run on the self-hosted runner with the "staging" label.
     # Ensure the staging runner has the "staging" label.
-    runs-on: [self-hosted, staging]  # Self-hosted EC2 with Tomcat installed (Staging)
+    runs-on: [self-hosted, Linux]  # Self-hosted EC2 with Tomcat installed (Staging)
     needs: build_and_test
     if: ${{ needs.build_and_test.result == 'success' }}  # Run only if build and test succeed
     steps:
@@ -62,7 +62,7 @@ jobs:
   upload_artifact:
     # This job will also run on the self-hosted runner with the "staging" label.
     # Ensure the staging runner has the "staging" label.
-    runs-on: [self-hosted, staging]  # Self-hosted EC2 with Tomcat installed (Staging)
+    runs-on: [self-hosted, Linux]  # Self-hosted EC2 with Tomcat installed (Staging)
     needs: build_and_test
     if: ${{ needs.build_and_test.result == 'success' }}  # Run only if build and test succeed
     steps:
@@ -121,7 +121,7 @@ jobs:
   deploy_input_condition:
     # This job will run on the self-hosted runner with the "production"  label.
     # Ensure your production runner has the label `production` assigned to it.
-    runs-on: [self-hosted, production]  # Self-hosted EC2 with Tomcat installed (Production)
+    runs-on: [self-hosted, Linux]  # Self-hosted EC2 with Tomcat installed (Production)
     if: ${{ github.event.inputs.deploy == 'true' }}  # Only runs if the deploy input is set to true from workflow_dispatch
     steps:
       - name: Checkout code
