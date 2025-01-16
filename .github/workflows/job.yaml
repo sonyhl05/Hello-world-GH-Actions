@@ -31,7 +31,7 @@ jobs:
           ./env-setup.sh  # This sets up Java, Maven, etc.
 
       - name: Build with Maven
-        run: mvn clean install -DskipTests
+        run: mvn clean package -DskipTests
         #if: ${{ github.event_name != 'pull_request' }}  # Only run on push events, skip for PR
 
       - name: Run Unit Tests with Maven
