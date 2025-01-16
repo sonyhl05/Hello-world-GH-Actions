@@ -6,7 +6,7 @@ sudo apt update -y
 
 # Install Java (OpenJDK 11)
 echo "Installing OpenJDK 11..."
-sudo apt install openjdk-11-jdk -y
+sudo apt install openjdk-11-jdk maven -y
 
 # Verify Java Installation
 echo "Verifying Java installation..."
