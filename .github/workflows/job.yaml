@@ -51,11 +51,16 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run SonarQube analysis
-        uses: SonarSource/sonarcloud-github-action@v1
-        with:
-          sonar-token: ${{ secrets.SONAR_TOKEN }}
-          sonar-host-url: 'https://sonarcloud.io'
-
+        #uses: SonarSource/sonarcloud-github-action@v1
+        #with:
+         # sonar-token: ${{ secrets.SONAR_TOKEN }}
+         # sonar-host-url: 'https://sonarcloud.io'
+        run: |
+          mvn clean verify sonar:sonar \
+            -Dsonar.organization=sonyhl05\
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.projectKey=sonyhl05_Hello-world-GH-Actions \
+            -Dsonar.login=d81b187ca87e07fb15087a45e3d7763ff6cc4c31
   upload_artifact:
     # This job will also run on the self-hosted runner with the "staging" label.
     # Ensure the staging runner has the "staging" label.
@@ -69,9 +74,9 @@ jobs:
       - name: Upload Artifact to JFrog Artifactory
         run: |
           echo "Uploading artifact to JFrog Artifactory..."
-          curl -u "${{ secrets.JFROG_USERNAME }}:${{ secrets.JFROG_API_KEY }}" \
-               -T target/my-helloworld.war \
-               "https://jfrog.example.com/artifactory/my-repo/my-helloworld-${{ needs.build_and_test.outputs.version }}.war"
+          curl -u "admin:cmVmdGtuOjAxOjE3Njg1NDM4NTQ6QU1JZWlyVk5GakQ5aFBDTEE1TUJ6Y0U4VHdK" \
+               -T target/my-helloworld-1.0-SNAPSHOT.war \
+               "http://3.110.223.11:8082/artifactory/github-action-assign-libs-snapshot/my-helloworld-1.0-SNAPSHOT.war"
 
   # Matrix Job: Deployment to Staging and Production (Self-Hosted EC2 with Tomcat installed)
   deploy:
