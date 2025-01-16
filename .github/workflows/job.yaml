@@ -33,7 +33,7 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean install -DskipTests
-        if: ${{ github.event_name != 'pull_request' }}  # Only run on push events, skip for PR
+        #if: ${{ github.event_name != 'pull_request' }}  # Only run on push events, skip for PR
 
       - name: Run Unit Tests with Maven
         run: mvn test
