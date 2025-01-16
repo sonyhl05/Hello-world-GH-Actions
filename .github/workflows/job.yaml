@@ -82,14 +82,16 @@ jobs:
     # This job will deploy to both staging and production environments based on the matrix configuration.
     # The staging environment will use the self-hosted runner with the "staging" label.
     # The production environment will use the self-hosted runner with the "production" label.
-    runs-on: [self-hosted, ${{ matrix.environment }}]  # Use dynamic environment (staging or production)
-    needs: [sonar_analysis, upload_artifact]  # Waits for SonarQube and Artifactory jobs to complete
     strategy:
       matrix:
-        environment: [staging, production]  # Deploy to both staging and production environments
+        node: [staging, production]
+    runs-on: ${{ matrix.node }} # Use dynamic environment (staging or production)
+    needs: [sonar_analysis, upload_artifact]  # Waits for SonarQube and Artifactory jobs to complete
+      # Deploy to both staging and production environments
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
 
       - name: Deploy to Tomcat (Staging/Production)
         run: |
