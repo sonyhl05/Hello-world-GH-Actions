@@ -15,7 +15,6 @@ on:
         description: 'Trigger deploy to production'
         required: true
         default: 'false'
-
 jobs:
   # Parallel Job: Build and Test on Self-Hosted EC2 (with Tomcat installed)
   build_and_test:
