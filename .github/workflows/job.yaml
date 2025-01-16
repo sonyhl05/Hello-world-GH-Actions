@@ -64,7 +64,7 @@ jobs:
     # This job will also run on the self-hosted runner with the "staging" label.
     # Ensure the staging runner has the "staging" label.
     runs-on: [self-hosted, staging]  # Self-hosted EC2 with Tomcat installed (Staging)
-    needs: sonar_analysis
+    needs: build_and_test
     if: ${{ needs.build_and_test.result == 'success' }}  # Run only if build and test succeed
     steps:
       - name: Checkout code
