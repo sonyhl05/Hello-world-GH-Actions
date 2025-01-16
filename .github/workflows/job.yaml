@@ -76,8 +76,8 @@ jobs:
           # chmod -R 777 /home/ubuntu/actions-runner/_work/Hello-world-GH-Actions/Hello-world-GH-Actions/target/
           echo "Uploading artifact to JFrog Artifactory..."
           curl -u "admin:cmVmdGtuOjAxOjE3Njg1NDM4NTQ6QU1JZWlyVk5GakQ5aFBDTEE1TUJ6Y0U4VHdK" \
-               -T target/my-helloworld-1.0-SNAPSHOT.war \
-               "http://3.110.223.11:8082/artifactory/github-action-assign-libs-snapshot/my-helloworld-1.0-SNAPSHOT.war"
+               -T target/my-helloworld-1.0.1.war \
+               "http://3.110.223.11:8082/artifactory/hello-world-war-libs-release/my-helloworld-1.0.1.war"
 
   # Matrix Job: Deployment to Staging and Production (Self-Hosted EC2 with Tomcat installed)
   deploy:
@@ -108,12 +108,12 @@ jobs:
             ls -l
             cd /opt/apache-tomcat-10.1.34/webapps/
             ls -l
-            curl -L -u "admin:cmVmdGtuOjAxOjE3Njg1NDM4NTQ6QU1JZWlyVk5GakQ5aFBDTEE1TUJ6Y0U4VHdK" -O "http://3.110.223.11:8082/artifactory/github-action-assign-libs-snapshot/my-helloworld-1.0-SNAPSHOT.war"
+            curl -L -u "admin:cmVmdGtuOjAxOjE3Njg1NDM4NTQ6QU1JZWlyVk5GakQ5aFBDTEE1TUJ6Y0U4VHdK" -O "http://3.110.223.11:8082/artifactory/hello-world-war-libs-release/my-helloworld-1.0.1.war"
             
           elif [ "${{ matrix.node }}" == "production" ]; then
             sudo chown -R ubuntu:ubuntu /opt
             cd /opt/apache-tomcat-10.1.34/webapps/
-            curl -L -u "admin:cmVmdGtuOjAxOjE3Njg1NDM4NTQ6QU1JZWlyVk5GakQ5aFBDTEE1TUJ6Y0U4VHdK" -O "http://3.110.223.11:8082/artifactory/github-action-assign-libs-snapshot/my-helloworld-1.0-SNAPSHOT.war"
+            curl -L -u "admin:cmVmdGtuOjAxOjE3Njg1NDM4NTQ6QU1JZWlyVk5GakQ5aFBDTEE1TUJ6Y0U4VHdK" -O "http://3.110.223.11:8082/artifactory/hello-world-war-libs-release/my-helloworld-1.0.1.war"
              
           else
               echo "Skipping production deployment:Node is not matching"
