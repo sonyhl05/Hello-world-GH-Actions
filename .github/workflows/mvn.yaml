@@ -123,7 +123,6 @@ jobs:
     steps:
      # - name: Checkout code
      #   uses: actions/checkout@v2
-
       - name: Deploy to Production (Input Triggered)
         run: |
           echo "Manual deploy triggered, deploying to production..."
