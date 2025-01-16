@@ -4,9 +4,9 @@
 echo "Updating the system..."
 sudo apt update -y
 
-# Install Java (OpenJDK 11)
-echo "Installing OpenJDK 11..."
-sudo apt install openjdk-11-jdk maven -y
+# Install Java (OpenJDK 17)
+echo "Installing OpenJDK 17..."
+sudo apt install openjdk-17-jdk maven -y
 
 # Verify Java Installation
 echo "Verifying Java installation..."
