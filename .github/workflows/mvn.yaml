@@ -1,0 +1,130 @@
+name: Java CI with Maven, SonarQube, and Production Deployment
+
+on:
+  push:
+    branches:
+      - master
+      - 'feature/*'
+  pull_request:
+    branches:
+      - master
+      - 'feature/*'
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Trigger deploy to production'
+        required: true
+        default: 'false'
+jobs:
+  # Parallel Job: Build and Test on Self-Hosted EC2 (with Tomcat installed)
+  build_and_test:
+    # This job will run on a self-hosted runner with the "staging" label.
+    # Ensure your self-hosted runner for staging has the label `staging` assigned to it.
+    runs-on: [self-hosted, staging]  # Self-hosted EC2 with Tomcat installed (Staging)
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run Environment Setup Script (env-setup.sh)
+        run: |
+          chmod +x ./env-setup.sh
+          ./env-setup.sh  # This sets up Java, Maven, etc.
+
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
+        #if: ${{ github.event_name != 'pull_request' }}  # Only run on push events, skip for PR
+
+      - name: Run Unit Tests with Maven
+        run: mvn test
+        if: ${{ success() }}  # Run this step only if the previous build step succeeded
+
+  # Sequential Jobs: SonarQube Analysis and Artifact Upload
+  sonar_analysis:
+    # This job will also run on the self-hosted runner with the "staging" label.
+    # Ensure the staging runner has the "staging" label.
+    runs-on: [self-hosted, staging]  # Self-hosted EC2 with Tomcat installed (Staging)
+    needs: build_and_test
+    if: ${{ needs.build_and_test.result == 'success' }}  # Run only if build and test succeed
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run SonarQube analysis
+        #uses: SonarSource/sonarcloud-github-action@v1
+        #with:
+         # sonar-token: ${{ secrets.SONAR_TOKEN }}
+         # sonar-host-url: 'https://sonarcloud.io'
+        run: |
+          mvn clean verify sonar:sonar \
+            -Dsonar.organization=sonyhl05\
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.projectKey=sonyhl05_Hello-world-GH-Actions \
+            -Dsonar.login=d81b187ca87e07fb15087a45e3d7763ff6cc4c31
+  upload_artifact:
+    # This job will also run on the self-hosted runner with the "staging" label.
+    # Ensure the staging runner has the "staging" label.
+    runs-on: [self-hosted, staging]  # Self-hosted EC2 with Tomcat installed (Staging)
+    needs: build_and_test
+    if: ${{ needs.build_and_test.result == 'success' }}  # Run only if build and test succeed
+    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v2
+
+      - name: Upload Artifact to JFrog Artifactory
+        run: |
+          pwd
+          # chmod -R 777 /home/ubuntu/actions-runner/_work/Hello-world-GH-Actions/Hello-world-GH-Actions/target/
+          echo "Uploading artifact to JFrog Artifactory..."
+          curl -u "admin:cmVmdGtuOjAxOjE3Njg1NDM4NTQ6QU1JZWlyVk5GakQ5aFBDTEE1TUJ6Y0U4VHdK" \
+               -T target/my-helloworld-1.0.1.war \
+               "http://3.110.223.11:8082/artifactory/hello-world-war-libs-release/my-helloworld-1.0.1.war"
+
+  # Matrix Job: Deployment to Staging and Production (Self-Hosted EC2 with Tomcat installed)
+  deploy:
+    # This job will deploy to both staging and production environments based on the matrix configuration.
+    # The staging environment will use the self-hosted runner with the "staging" label.
+    # The production environment will use the self-hosted runner with the "production" label.
+    strategy:
+      matrix:
+        node: [staging, production]
+    runs-on: ${{ matrix.node }} # Use dynamic environment (staging or production)
+    needs: [sonar_analysis, upload_artifact]  # Waits for SonarQube and Artifactory jobs to complete
+      # Deploy to both staging and production environments
+    steps:
+      #- name: Checkout code
+      #  uses: actions/checkout@v2
+
+      - name: Deploy to Tomcat (Staging/Production)
+        run: |
+          echo "Deploying to ${{ matrix.node }}..."
+
+          # Deploy artifact to the appropriate Tomcat server based on the environment
+          if [ "${{ matrix.node }}" == "staging" ]; then
+            pwd
+            cp target/*.war cd /opt/apache-tomcat-10.1.34/webapps/
+            
+          elif [ "${{ matrix.node }}" == "production" ]; then
+            sudo chown -R ubuntu:ubuntu /opt
+            cd /opt/apache-tomcat-10.1.34/webapps/
+            curl -L -u "admin:cmVmdGtuOjAxOjE3Njg1NDM4NTQ6QU1JZWlyVk5GakQ5aFBDTEE1TUJ6Y0U4VHdK" -O "http://3.110.223.11:8082/artifactory/hello-world-war-libs-release/my-helloworld-1.0.1.war"
+             
+          else
+              echo "Skipping production deployment:Node is not matching"
+          fi
+        if: ${{ needs.upload_artifact.result == 'success' }}  # Deploy only if the artifact upload was successful
+
+  # Conditional Job: Trigger Deploy Only if Deploy Input is True (Manual Trigger )
+  deploy_input_condition:
+    # This job will run on the self-hosted runner with the "production"  label.
+    # Ensure your production runner has the label `production` assigned to it.
+    runs-on: [self-hosted, production]  # Self-hosted EC2 with Tomcat installed (Production)
+    if: ${{ github.event.inputs.deploy == 'true' }}  # Only runs if the deploy input is set to true from workflow_dispatch
+    steps:
+     # - name: Checkout code
+     #   uses: actions/checkout@v2
+
+      - name: Deploy to Production (Input Triggered)
+        run: |
+          echo "Manual deploy triggered, deploying to production..."
+          # Deployment logic here
+        if: ${{ github.event.inputs.deploy == 'true' }}  # Condition based on the inpu
