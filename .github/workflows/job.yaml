@@ -72,6 +72,7 @@ jobs:
 
       - name: Upload Artifact to JFrog Artifactory
         run: |
+          pwd
           echo "Uploading artifact to JFrog Artifactory..."
           curl -u "admin:cmVmdGtuOjAxOjE3Njg1NDM4NTQ6QU1JZWlyVk5GakQ5aFBDTEE1TUJ6Y0U4VHdK" \
                -T target/my-helloworld-1.0-SNAPSHOT.war \
