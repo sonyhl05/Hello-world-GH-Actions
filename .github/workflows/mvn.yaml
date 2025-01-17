@@ -22,8 +22,8 @@ jobs:
     # Ensure your self-hosted runner for staging has the label `staging` assigned to it.
     runs-on: [self-hosted, staging]  # Self-hosted EC2 with Tomcat installed (Staging)
     steps:
-     # - name: Checkout code
-     #   uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Run Environment Setup Script (env-setup.sh)
         run: |
@@ -46,8 +46,8 @@ jobs:
     needs: build_and_test
     if: ${{ needs.build_and_test.result == 'success' }}  # Run only if build and test succeed
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      #- name: Checkout code
+      #  uses: actions/checkout@v2
 
       - name: Run SonarQube analysis
         #uses: SonarSource/sonarcloud-github-action@v1
